@@ -1,32 +1,43 @@
 import React, { useState, useEffect, useRef } from "react";
 import ReactDOM from "react-dom";
 
-const useClick = onClick => {
-  if (typeof onClick !== "function") {
+const useConfirm = (message = "", callback, rejection) => {
+  if (typeof callback !== "function") {
     return;
   }
-  const element = useRef();
-  useEffect(() => {
-    //did mount
-    if (element.current) {
-      element.current.addEventListener("click", onClick);
+  const confirmAction = () => {
+    if (confirm(message)) {
+      callback();
+    } else {
+      rejection();
     }
-    //will unMount
-    return () => {
-      if (element.current) {
-        element.current.removeEventListener("click", onClick);
-      }
-    };
-  }, []);
-  return element;
+  };
+  return confirmAction;
+};
+
+const usePreventLeave = () => {
+  const listener = event => {
+    event.preventDefault();
+    event.returnValue = "";
+  };
+  const enablePrevent = () => window.addEventListener("beforeunload", listener);
+  const disablePrevent = () =>
+    window.removeEventListener("beforeunload", listener);
+  return { enablePrevent, disablePrevent };
 };
 
 const App = () => {
-  const sayHello = () => console.log("hello");
-  const title = useClick(sayHello);
+  const deleteWorld = () => console.log("Del");
+  const abort = () => console.log("Abort");
+  const confirmDelete = useConfirm("are you sure?", deleteWorld, abort);
+
+  const { enablePrevent, disablePrevent } = usePreventLeave();
+
   return (
     <div className="App">
-      <h1 ref={title}>Hi</h1>
+      <button onClick={confirmDelete}>Delete the world</button>
+      <button onClick={enablePrevent}>Protect</button>
+      <button onClick={disablePrevent}>Unprotect</button>
     </div>
   );
 };
