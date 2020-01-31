@@ -1,52 +1,39 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom";
 
-import "./styles.css";
+const content = [
+  {
+    tab: "Section 1",
+    content: "I'm the content of the Section 1"
+  },
+  {
+    tab: "Section 2",
+    content: "I'm the content of the Section 2"
+  }
+];
+
+const useTabs = (initialTab, allTabs) => {
+  if (!allTabs || !Array.isArray(allTabs)) {
+    return;
+  }
+  const [currentIndex, setCurrentIndex] = useState(initialTab);
+  return {
+    currentItem: allTabs[currentIndex],
+    changeItem: setCurrentIndex
+  };
+};
 
 const App = () => {
-  const [item, setItem] = useState(1);
-  const incrementItem = () => setItem(item + 1);
-  const decrementItem = () => setItem(item - 1);
+  const { currentItem, changeItem } = useTabs(0, content);
   return (
     <div className="App">
-      <h1>{item}Hello CodeSandbdasdsox</h1>
-      <h2>Start editing to see some magic happen!</h2>
-      <button onClick={incrementItem} />
-      <button onClick={decrementItem} />
+      {content.map((section, index) => (
+        <button onClick={() => changeItem(index)}>{section.tab}</button>
+      ))}
+      <div>{currentItem.content}</div>
     </div>
   );
 };
 
-class AppUgly extends React.Component {
-  state = {
-    item: 1
-  };
-  render() {
-    const { item } = this.state;
-    return (
-      <div className="App">
-        <h1>{item}Hello CodeSandbdasdsox</h1>
-        <h2>Start editing to see some magic happen!</h2>
-        <button onClick={this.incrementItem} />
-        <button onClick={this.decrementItem} />
-      </div>
-    );
-  }
-  incrementItem = () => {
-    this.setState(state => {
-      return {
-        item: state.item + 1
-      };
-    });
-  };
-  decrementItem = () => {
-    this.setState(state => {
-      return {
-        item: state.item - 1
-      };
-    });
-  };
-}
-
 const rootElement = document.getElementById("root");
-ReactDOM.render(<AppUgly />, rootElement);
+ReactDOM.render(<App />, rootElement);
